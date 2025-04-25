@@ -4,16 +4,19 @@ import sys
 from tqdm import tqdm
 import os
 from os import path
-from .corenlp import StanfordCoreNLP
+from corenlp import StanfordCoreNLP
 from nltk.tree import Tree
 import json
 from random import randint
+import stanza
+import json
+from tqdm import tqdm
+from os import path
 
-
-FULL_MODEL = './stanford-corenlp-full-2018-10-05'
-if not os.path.exists(FULL_MODEL):
-    print('Stanford CoreNLP does not exist under %s' % FULL_MODEL)
-    exit(1)
+# FULL_MODEL = './stanford-corenlp-full'
+# if not os.path.exists(FULL_MODEL):
+#     print('Stanford CoreNLP does not exist under %s' % FULL_MODEL)
+#     exit(1)
 
 
 def read_txt(file_path):
@@ -23,10 +26,11 @@ def read_txt(file_path):
         lines = f.readlines()
         sentence = []
         labels = []
-        for line in lines:
+        for i,line in enumerate(lines):
             line = line.strip()
             if line == '':
                 if len(sentence) > 0:
+                    assert len(sentence) == len(labels)
                     sentence_list.append(sentence)
                     label_list.append(labels)
                     sentence = []
@@ -56,7 +60,6 @@ def extract_syn(parse_str, verb_index, sent_length):
     words = c_parse.leaves()
     for s in c_parse.subtrees(lambda t: t.height() > 2):
         leaves = s.leaves()
-
         if len(leaves) == 0:
             continue
 
@@ -69,7 +72,7 @@ def extract_syn(parse_str, verb_index, sent_length):
         current_sub_index = start_index
         for i, t in enumerate(s):
             sub_start_index = current_sub_index
-            sub_end_index = sub_start_index + len(t.leaves())
+            sub_end_index = min(sub_start_index + len(t.leaves()), len(leaves))
             current_sub_index = sub_end_index
             node = t.label()
             for index in range(sub_start_index, sub_end_index):
@@ -79,73 +82,134 @@ def extract_syn(parse_str, verb_index, sent_length):
                     syn_label[index] = node + '_L'
                 else:
                     syn_label[index] = node + '_R'
-
     return syn_label
 
 
 def find_verb_index(labels):
     index_list = []
     for i, l in enumerate(labels):
-        if l == 'V':
+        if 'B-s'in l:
             index_list.append(i)
-    assert len(index_list) > 0
-    return index_list
+    if len(index_list) ==1:
+        return index_list
+    else:
+        return None
+
+
+# def request_features_from_stanford(data_dir, flag):
+#     all_sentences, all_labels = read_txt(path.join(data_dir, flag + '.tsv'))
+#     sentences_str = []
+#     for sentence in all_sentences:
+#         sentence = [change(i) for i in sentence]
+#         # if sentence[-1] == '·':
+#         #     sentence[-1] = '.'
+#         sentences_str.append(' '.join(sentence))
+#
+#     all_data = []
+#     syn_label_set = set()
+#     tmp_sent = ''
+#     with StanfordCoreNLP(FULL_MODEL, lang='en', port=randint(38400, 38596)) as nlp:
+#         for i in tqdm(range(len(sentences_str))):
+#             sentence = sentences_str[i]
+#             labels = all_labels[i]
+#             ori_sentence = all_sentences[i]
+#             props = {
+#                 'timeout': '500000',
+#                 'annotators': 'pos, parse, depparse',
+#                 'tokenize.whitespace': 'true',
+#                 'ssplit.eolonly': 'true',
+#                 'pipelineLanguage': 'en',
+#                 'outputFormat': 'json'}
+#             if not sentence == tmp_sent:
+#                 results = nlp.annotate(sentence, properties=props)
+#                 tmp_sent = sentence
+#                 result = results['sentences'][0]
+#                 results['word'] = [t['word'] for t in result['tokens']]
+#                 results['pos_label'] = [t['pos'] for t in result['tokens']]
+#                 parse_str = ' '.join(result['parse'].split())
+#
+#             sent_length = len(labels)
+#
+#             syn_label = extract_syn(parse_str, find_verb_index(labels), sent_length)
+#             results['syn_label'] = syn_label
+#             syn_label_set.update(syn_label)
+#             results['ori_syn_label'] = parse_str
+#             # results = nlp.request(annotators='deparser', data=sentence)
+#             # results = nlp.request(annotators='pos', data=sentence)
+#             results['sequence_label'] = labels
+#             results['ori_sentence'] = ori_sentence
+#
+#             all_data.append(results)
+#     # assert len(all_data) == len(sentences_str)
+#     with open(path.join(data_dir, flag + '.stanford.json'), 'w', encoding='utf8') as f:
+#         for data in all_data:
+#             json.dump(data, f, ensure_ascii=False)
+#             f.write('\n')
+#
+#     # syn_label_set = list(syn_label_set)
+#     # syn_label_set.sort()
+#     # print(syn_label_set)
 
 
 def request_features_from_stanford(data_dir, flag):
+    # Load Stanza pipeline
+    c=0
+    nlp = stanza.Pipeline(lang='en', processors='tokenize,pos,constituency,lemma,depparse', tokenize_no_ssplit=True)
+
     all_sentences, all_labels = read_txt(path.join(data_dir, flag + '.tsv'))
     sentences_str = []
     for sentence in all_sentences:
         sentence = [change(i) for i in sentence]
-        # if sentence[-1] == '·':
-        #     sentence[-1] = '.'
         sentences_str.append(' '.join(sentence))
 
     all_data = []
     syn_label_set = set()
     tmp_sent = ''
-    with StanfordCoreNLP(FULL_MODEL, lang='en', port=randint(38400, 38596)) as nlp:
-        for i in tqdm(range(len(sentences_str))):
-            sentence = sentences_str[i]
-            labels = all_labels[i]
-            ori_sentence = all_sentences[i]
-            props = {
-                'timeout': '500000',
-                'annotators': 'pos, parse, depparse',
-                'tokenize.whitespace': 'true',
-                'ssplit.eolonly': 'true',
-                'pipelineLanguage': 'en',
-                'outputFormat': 'json'}
-            if not sentence == tmp_sent:
-                results = nlp.annotate(sentence, properties=props)
-                tmp_sent = sentence
-                result = results['sentences'][0]
-                results['word'] = [t['word'] for t in result['tokens']]
-                results['pos_label'] = [t['pos'] for t in result['tokens']]
-                parse_str = ' '.join(result['parse'].split())
 
-            sent_length = len(labels)
+    for i in tqdm(range(len(sentences_str))):
+        sentence = sentences_str[i]
+        labels = all_labels[i]
+        ori_sentence = all_sentences[i]
 
-            syn_label = extract_syn(parse_str, find_verb_index(labels), sent_length)
-            results['syn_label'] = syn_label
-            syn_label_set.update(syn_label)
-            results['ori_syn_label'] = parse_str
-            # results = nlp.request(annotators='deparser', data=sentence)
-            # results = nlp.request(annotators='pos', data=sentence)
-            results['sequence_label'] = labels
-            results['ori_sentence'] = ori_sentence
+        if not sentence == tmp_sent:
 
-            all_data.append(results)
-    # assert len(all_data) == len(sentences_str)
+            doc = nlp(sentence.split())
+            result = doc.sentences[0]
+
+            # Extract info
+            words = [word.text for word in result.words]
+            pos_label = [word.upos for word in result.words]
+            parse_str = str(result.constituency)
+
+            tmp_sent = sentence
+
+        sent_length = len(labels)
+        verb_index = find_verb_index(labels)
+        if verb_index:
+            syn_label = extract_syn(parse_str, verb_index, sent_length)
+        else:
+            c+=1
+            print(c)
+            print('verb is not found in the sent')
+            continue
+
+        results = {
+            'word': words,
+            'pos_label': pos_label,
+            'syn_label': syn_label,
+            'ori_syn_label': parse_str,
+            'sequence_label': labels,
+            'ori_sentence': ori_sentence
+        }
+
+        syn_label_set.update(syn_label)
+        all_data.append(results)
+
+    # Save to file
     with open(path.join(data_dir, flag + '.stanford.json'), 'w', encoding='utf8') as f:
         for data in all_data:
             json.dump(data, f, ensure_ascii=False)
             f.write('\n')
-
-    # syn_label_set = list(syn_label_set)
-    # syn_label_set.sort()
-    # print(syn_label_set)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
