@@ -442,16 +442,16 @@ class SRTagger(nn.Module):
         return examples
 
     def get_dep_labels(self):
-        # if self.tool == "spacy":
-        #     labels = ["nsubj","prep","det","amod","pobj","advmod","ROOT","attr","","appos","punct","npadvmod","nmod",
-        #          "compound","aux","cc","conj","acomp","nsubjpass","auxpass","poss","dobj","preconj","neg","relcl",
-        #          "ccomp","xcomp","pcomp","intj","acl","dep","prt","nummod","quantmod","mark","advcl","dative","agent",
-        #          "case","oprd","parataxis","csubj","expl","predet","meta","csubjpass"]
-        # else:
-        labels = ["ROOT","det","nsubj","mark","acl","advmod","nmod:poss","amod","dobj","case","nmod","compound","punct",
-                "nsubjpass","auxpass","cc","conj","advcl","cop","acl:relcl","ccomp","aux","csubjpass","nummod","dep",
-                "xcomp","appos","nmod:npmod","compound:prt","root","nmod:tmod","neg","mwe","parataxis","det:predet",
-                "expl","iobj","cc:preconj","csubj","discourse", "prep"]
+        labels1 = ["nsubj","prep","det","amod","pobj","advmod","ROOT","attr","","appos","punct","npadvmod","nmod",
+                 "compound","aux","cc","conj","acomp","nsubjpass","auxpass","poss","dobj","preconj","neg","relcl",
+                 "ccomp","xcomp","pcomp","intj","acl","dep","prt","nummod","quantmod","mark","advcl","dative","agent",
+                 "case","oprd","parataxis","csubj","expl","predet","meta","csubjpass"]
+
+        labels2 = ["ROOT","det","nsubj","mark","acl","advmod","nmod:poss","amod","dobj","case","nmod","compound","punct",
+                    "nsubjpass","auxpass","cc","conj","advcl","cop","acl:relcl","ccomp","aux","csubjpass","nummod","dep",
+                    "xcomp","appos","nmod:npmod","compound:prt","root","nmod:tmod","neg","mwe","parataxis","det:predet",
+                    "expl","iobj","cc:preconj","csubj","discourse", "prep"]
+        labels  = labels1 + labels2
         final_labels = ["self_loop"]
         for label in labels:
             if self.direct:
