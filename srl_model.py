@@ -588,7 +588,8 @@ class SRTagger(nn.Module):
                 return final_dep_adj_matrix, final_dep_type_matrix
 
             first_order_dep_adj_matrix, first_order_dep_type_matrix = get_adj_with_value_matrix(example["first_order_dep_adj_matrix"], example["first_order_dep_type_matrix"])
-            
+            print(first_order_dep_adj_matrix,
+                  first_order_dep_type_matrix)
             def get_pos_mask_matrix():
                 pos_mask_matrix = np.zeros((max_words_num, max_words_num), dtype=np.int)
                 for p_i in range(max_words_num):
