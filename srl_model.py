@@ -573,8 +573,8 @@ class SRTagger(nn.Module):
 
             max_words_num = sum(valid)
             def get_adj_with_value_matrix(dep_adj_matrix, dep_type_matrix):
-                final_dep_adj_matrix = np.zeros((max_words_num, max_words_num), dtype=np.int)
-                final_dep_type_matrix = np.zeros((max_words_num, max_words_num), dtype=np.int)
+                final_dep_adj_matrix = np.zeros((max_words_num, max_words_num), dtype=int)
+                final_dep_type_matrix = np.zeros((max_words_num, max_words_num), dtype=int)
                 for pi in range(max_words_num):
                     for pj in range(max_words_num):
                         if dep_adj_matrix[pi][pj] == 0:
@@ -591,7 +591,7 @@ class SRTagger(nn.Module):
             print(first_order_dep_adj_matrix,
                   first_order_dep_type_matrix)
             def get_pos_mask_matrix():
-                pos_mask_matrix = np.zeros((max_words_num, max_words_num), dtype=np.int)
+                pos_mask_matrix = np.zeros((max_words_num, max_words_num), dtype=int)
                 for p_i in range(max_words_num):
                     for p_j in range(max(p_i - 2, 0), min(max_words_num, p_i + 3)):
                         pos_mask_matrix[p_i][p_j] = 1
@@ -715,20 +715,20 @@ class SRTagger(nn.Module):
 
         max_len = all_lmask_ids.shape[1]
         def get_dep_matrix(ori_dep_type_matrix):
-            dep_type_matrix = np.zeros((max_len, max_len), dtype=np.int)
+            dep_type_matrix = np.zeros((max_len, max_len), dtype=int)
             max_words_num = len(ori_dep_type_matrix)
             for i in range(max_words_num):
                 dep_type_matrix[i][:max_words_num] = ori_dep_type_matrix[i]
             return dep_type_matrix
 
         def get_dep_key_list(dep_key_list):
-            t_dep_key_list = np.zeros((max_len), dtype=np.int)
+            t_dep_key_list = np.zeros((max_len), dtype=int)
             for i in range(len(dep_key_list)):
                 t_dep_key_list[i] = dep_key_list[i]
             return t_dep_key_list
         
         def get_pos_syn_mask_matrix(ori_matrix):
-            new_matrix = np.zeros((max_len, max_len), dtype=np.int)
+            new_matrix = np.zeros((max_len, max_len), dtype=int)
             max_words_num = len(ori_matrix)
             for i in range(max_words_num):
                 new_matrix[i][:max_words_num] = ori_matrix[i]
