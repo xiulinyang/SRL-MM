@@ -211,15 +211,14 @@ class SRTagger(nn.Module):
                 ):
 
         if self.bert is not None:
-            sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
+            sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask)
         elif self.xlnet is not None:
             transformer_outputs = self.xlnet(input_ids, token_type_ids, attention_mask=attention_mask)
             sequence_output = transformer_outputs[0]
         elif self.zen is not None:
             sequence_output, _ = self.zen(input_ids, input_ngram_ids=input_ngram_ids,
                                           ngram_position_matrix=ngram_position_matrix,
-                                          token_type_ids=token_type_ids, attention_mask=attention_mask,
-                                          output_all_encoded_layers=False)
+                                          token_type_ids=token_type_ids, attention_mask=attention_mask)
         else:
             raise ValueError()
 
