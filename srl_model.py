@@ -130,33 +130,23 @@ class SRTagger(nn.Module):
         self.xlnet = None
         if self.hpara['use_bert']:
             self.tokenizer = BertTokenizer.from_pretrained(model_path, do_lower_case=self.hpara['do_lower_case'])
-            if from_pretrained:
-                self.bert = BertModel.from_pretrained(model_path, cache_dir='')
-            else:
-                from modules import CONFIG_NAME, BertConfig
-                config_file = os.path.join(model_path, CONFIG_NAME)
-                config = BertConfig.from_json_file(config_file)
-                self.bert = BertModel(config)
+            self.bert = BertModel.from_pretrained(model_path, cache_dir='')
             hidden_size = self.bert.config.hidden_size
             self.dropout = nn.Dropout(self.bert.config.hidden_dropout_prob)
         elif self.hpara['use_xlnet']:
             self.tokenizer = XLNetTokenizer.from_pretrained(model_path, do_lower_case=self.hpara['do_lower_case'])
-            if from_pretrained:
-                print(model_path)
-                self.xlnet = XLNetModel.from_pretrained(model_path)
-                state_dict = torch.load(os.path.join(model_path, 'pytorch_model.bin'))
-                key_list = list(state_dict.keys())
-                reload = False
-                for key in key_list:
-                    if key.find('xlnet.') > -1:
-                        reload = True
-                        state_dict[key[key.find('xlnet.') + len('xlnet.'):]] = state_dict[key]
-                    state_dict.pop(key)
-                if reload:
-                    self.xlnet.load_state_dict(state_dict)
-            else:
-                config, model_kwargs = XLNetModel.config_class.from_pretrained(model_path, return_unused_kwargs=True)
-                self.xlnet = XLNetModel(config)
+            print(model_path)
+            self.xlnet = XLNetModel.from_pretrained(model_path)
+            state_dict = torch.load(os.path.join(model_path, 'pytorch_model.bin'))
+            key_list = list(state_dict.keys())
+            reload = False
+            for key in key_list:
+                if key.find('xlnet.') > -1:
+                    reload = True
+                    state_dict[key[key.find('xlnet.') + len('xlnet.'):]] = state_dict[key]
+                state_dict.pop(key)
+            if reload:
+                self.xlnet.load_state_dict(state_dict)
             hidden_size = self.xlnet.config.hidden_size
             self.dropout = nn.Dropout(self.xlnet.config.summary_last_dropout)
         else:
