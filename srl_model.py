@@ -451,7 +451,7 @@ class SRTagger(nn.Module):
         labels = ["ROOT","det","nsubj","mark","acl","advmod","nmod:poss","amod","dobj","case","nmod","compound","punct",
                 "nsubjpass","auxpass","cc","conj","advcl","cop","acl:relcl","ccomp","aux","csubjpass","nummod","dep",
                 "xcomp","appos","nmod:npmod","compound:prt","root","nmod:tmod","neg","mwe","parataxis","det:predet",
-                "expl","iobj","cc:preconj","csubj","discourse"]
+                "expl","iobj","cc:preconj","csubj","discourse", "prep"]
         final_labels = ["self_loop"]
         for label in labels:
             if self.direct:
@@ -475,7 +475,6 @@ class SRTagger(nn.Module):
     def convert_examples_to_features(self, examples):
 
         dep_label_map = self.vals_dict
-        print(dep_label_map)
         features = []
 
         length_list = []
@@ -584,12 +583,12 @@ class SRTagger(nn.Module):
                             continue
                         if self.keys_frequency_dict[dep_key_list[pj]] < self.freq_limit:
                             continue
-                        print(dep_adj_matrix)
-                        print(dep_type_matrix)
-                        print(final_dep_adj_matrix)
-                        print(final_dep_type_matrix)
+
                         final_dep_adj_matrix[pi][pj] = dep_adj_matrix[pi][pj]
+                        # if dep_type_matrix[pi][pj] in dep_label_map:
                         final_dep_type_matrix[pi][pj] = dep_label_map[dep_type_matrix[pi][pj]]
+                        # else:
+                            # final_dep_type_matrix[pi][pj] = 0
                 return final_dep_adj_matrix, final_dep_type_matrix
 
             first_order_dep_adj_matrix, first_order_dep_type_matrix = get_adj_with_value_matrix(example["first_order_dep_adj_matrix"], example["first_order_dep_type_matrix"])
