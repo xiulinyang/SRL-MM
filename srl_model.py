@@ -583,6 +583,8 @@ class SRTagger(nn.Module):
                             continue
                         if self.keys_frequency_dict[dep_key_list[pj]] < self.freq_limit:
                             continue
+                        print(dep_adj_matrix)
+                        print(dep_type_matrix)
                         print(final_dep_adj_matrix)
                         print(final_dep_type_matrix)
                         final_dep_adj_matrix[pi][pj] = dep_adj_matrix[pi][pj]
