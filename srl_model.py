@@ -311,7 +311,7 @@ class SRTagger(nn.Module):
         hyper_parameters['max_seq_length'] = args.max_seq_length
         hyper_parameters['use_bert'] = args.use_bert
         hyper_parameters['use_xlnet'] = args.use_xlnet
-        hyper_parameters['use_zen'] = args.use_zen
+        hyper_parameters['use_zen'] = False
         hyper_parameters['do_lower_case'] = args.do_lower_case
         hyper_parameters['mlp_dropout'] = args.mlp_dropout
         hyper_parameters['n_mlp'] = args.n_mlp
