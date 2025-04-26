@@ -475,6 +475,7 @@ class SRTagger(nn.Module):
     def convert_examples_to_features(self, examples):
 
         dep_label_map = self.vals_dict
+        print(dep_label_map)
         features = []
 
         length_list = []
