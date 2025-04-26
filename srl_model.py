@@ -130,6 +130,7 @@ class SRTagger(nn.Module):
         self.bert = None
         self.xlnet = None
         if self.hpara['use_bert']:
+            print(model_path)
             self.tokenizer = BertTokenizer.from_pretrained(model_path, do_lower_case=self.hpara['do_lower_case'])
             self.bert = BertModel.from_pretrained(model_path)
             hidden_size = self.bert.config.hidden_size
