@@ -211,7 +211,8 @@ class SRTagger(nn.Module):
                 ):
 
         if self.bert is not None:
-            sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask)
+            outputs = self.bert(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)
+            sequence_output = outputs.last_hidden_state
         elif self.xlnet is not None:
             transformer_outputs = self.xlnet(input_ids, token_type_ids, attention_mask=attention_mask)
             sequence_output = transformer_outputs[0]
