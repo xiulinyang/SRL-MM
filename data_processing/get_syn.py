@@ -55,11 +55,13 @@ def change(char):
 
 def extract_syn(parse_str, verb_index, sent_length):
     c_parse = Tree.fromstring(parse_str)
+    # print(c_parse)
     current_index = 0
     syn_label = ['' for _ in range(sent_length)]
     words = c_parse.leaves()
     for s in c_parse.subtrees(lambda t: t.height() > 2):
         leaves = s.leaves()
+        # print(leaves)
         if len(leaves) == 0:
             continue
 
@@ -72,16 +74,19 @@ def extract_syn(parse_str, verb_index, sent_length):
         current_sub_index = start_index
         for i, t in enumerate(s):
             sub_start_index = current_sub_index
-            sub_end_index = min(sub_start_index + len(t.leaves()), len(leaves))
+            sub_end_index = sub_start_index + len(t.leaves())
             current_sub_index = sub_end_index
             node = t.label()
             for index in range(sub_start_index, sub_end_index):
+                # try:
                 if index in verb_index:
                     syn_label[index] = 'V'
                 elif index < verb_index[0]:
                     syn_label[index] = node + '_L'
                 else:
                     syn_label[index] = node + '_R'
+                # except KeyError:
+                #     continue
     return syn_label
 
 
@@ -145,16 +150,16 @@ def find_verb_index(labels):
 #         for data in all_data:
 #             json.dump(data, f, ensure_ascii=False)
 #             f.write('\n')
-#
-#     # syn_label_set = list(syn_label_set)
-#     # syn_label_set.sort()
-#     # print(syn_label_set)
+
+    # syn_label_set = list(syn_label_set)
+    # syn_label_set.sort()
+    # print(syn_label_set)
 
 
 def request_features_from_stanford(data_dir, flag):
     # Load Stanza pipeline
     c=0
-    nlp = stanza.Pipeline(lang='en', processors='tokenize,pos,constituency,lemma,depparse', tokenize_no_ssplit=True)
+    nlp = stanza.Pipeline(lang='en', processors='tokenize,pos,constituency,lemma,depparse',tokenize_pretokenized=True, tokenize_no_ssplit=True)
 
     all_sentences, all_labels = read_txt(path.join(data_dir, flag + '.tsv'))
     sentences_str = []
@@ -173,12 +178,14 @@ def request_features_from_stanford(data_dir, flag):
 
         if not sentence == tmp_sent:
 
-            doc = nlp(sentence.split())
+            doc = nlp(sentence)
             result = doc.sentences[0]
 
             # Extract info
             words = [word.text for word in result.words]
             pos_label = [word.upos for word in result.words]
+            dep_label = [word.deprel for word in result.words]
+            head_id = [word.head for word in result.words]
             parse_str = str(result.constituency)
 
             tmp_sent = sentence
@@ -187,6 +194,8 @@ def request_features_from_stanford(data_dir, flag):
         verb_index = find_verb_index(labels)
         if verb_index:
             syn_label = extract_syn(parse_str, verb_index, sent_length)
+            # print(syn_label)
+            syn_label_set.update(syn_label)
         else:
             c+=1
             print(c)
@@ -196,6 +205,8 @@ def request_features_from_stanford(data_dir, flag):
         results = {
             'word': words,
             'pos_label': pos_label,
+            'dep_label': dep_label,
+            'head_id': head_id,
             'syn_label': syn_label,
             'ori_syn_label': parse_str,
             'sequence_label': labels,
