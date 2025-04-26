@@ -5,7 +5,8 @@ import math
 import numpy as np
 import torch
 from torch import nn
-from modules import BertModel, BertTokenizer, Biaffine, MLP, CRF
+from transformers import BertModel, BertTokenizer
+from modules import Biaffine, MLP, CRF
 from transformers_xlnet import XLNetModel, XLNetTokenizer
 from srl_helper import save_json, load_json, get_pos_label_list, get_syn_label_list
 import subprocess
