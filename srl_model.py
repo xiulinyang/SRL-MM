@@ -129,13 +129,14 @@ class SRTagger(nn.Module):
         self.bert = None
         self.xlnet = None
         if self.hpara['use_bert']:
+            print(model_path)
             self.tokenizer = BertTokenizer.from_pretrained(model_path, do_lower_case=self.hpara['do_lower_case'])
-            self.bert = BertModel.from_pretrained(model_path, cache_dir='')
+            self.bert = BertModel.from_pretrained(model_path)
             hidden_size = self.bert.config.hidden_size
             self.dropout = nn.Dropout(self.bert.config.hidden_dropout_prob)
         elif self.hpara['use_xlnet']:
             self.tokenizer = XLNetTokenizer.from_pretrained(model_path, do_lower_case=self.hpara['do_lower_case'])
-            print(model_path)
+
             self.xlnet = XLNetModel.from_pretrained(model_path)
             state_dict = torch.load(os.path.join(model_path, 'pytorch_model.bin'))
             key_list = list(state_dict.keys())
