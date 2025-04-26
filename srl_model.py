@@ -583,13 +583,14 @@ class SRTagger(nn.Module):
                             continue
                         if self.keys_frequency_dict[dep_key_list[pj]] < self.freq_limit:
                             continue
+                        print(final_dep_adj_matrix)
+                        print(final_dep_type_matrix)
                         final_dep_adj_matrix[pi][pj] = dep_adj_matrix[pi][pj]
                         final_dep_type_matrix[pi][pj] = dep_label_map[dep_type_matrix[pi][pj]]
                 return final_dep_adj_matrix, final_dep_type_matrix
 
             first_order_dep_adj_matrix, first_order_dep_type_matrix = get_adj_with_value_matrix(example["first_order_dep_adj_matrix"], example["first_order_dep_type_matrix"])
-            print(first_order_dep_adj_matrix,
-                  first_order_dep_type_matrix)
+
             def get_pos_mask_matrix():
                 pos_mask_matrix = np.zeros((max_words_num, max_words_num), dtype=int)
                 for p_i in range(max_words_num):
