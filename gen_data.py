@@ -27,6 +27,15 @@ for x in ['dev', 'train', 'test']:
                     new_dict['sentences'][0]['tokens'].append(token_dict)
                 new_dict['ori_sentence'] = b['ori_sentence']
                 new_dict['word'] = b['word']
+                real_seq_label = []
+                c=0
+                for seq in b['sequence_label']:
+                    if 'B-s' not in seq:
+                        real_seq_label.append(seq)
+                    else:
+                        real_seq_label.append('V')
+                        c+=1
+                assert c==1
                 new_dict['sequence_label'] = b['sequence_label']
                 new_dict['syn_label'] = b['syn_label']
                 new_dict['ori_syn_label'] = b['ori_syn_label']
