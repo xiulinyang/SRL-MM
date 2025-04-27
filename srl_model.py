@@ -442,16 +442,21 @@ class SRTagger(nn.Module):
         return examples
 
     def get_dep_labels(self):
-        labels1 = ["nsubj","prep","det","amod","pobj","advmod","ROOT","attr","","appos","punct","npadvmod","nmod",
-                 "compound","aux","cc","conj","acomp","nsubjpass","auxpass","poss","dobj","preconj","neg","relcl",
-                 "ccomp","xcomp","pcomp","intj","acl","dep","prt","nummod","quantmod","mark","advcl","dative","agent",
-                 "case","oprd","parataxis","csubj","expl","predet","meta","csubjpass"]
+        # labels1 = ["nsubj","prep","det","amod","pobj","advmod","ROOT","attr","","appos","punct","npadvmod","nmod",
+        #          "compound","aux","cc","conj","acomp","nsubjpass","auxpass","poss","dobj","preconj","neg","relcl",
+        #          "ccomp","xcomp","pcomp","intj","acl","dep","prt","nummod","quantmod","mark","advcl","dative","agent",
+        #          "case","oprd","parataxis","csubj","expl","predet","meta","csubjpass"]
 
-        labels2 = ["ROOT","det","nsubj","mark","acl","advmod","nmod:poss","amod","dobj","case","nmod","compound","punct",
-                    "nsubjpass","auxpass","cc","conj","advcl","cop","acl:relcl","ccomp","aux","csubjpass","nummod","dep",
-                    "xcomp","appos","nmod:npmod","compound:prt","root","nmod:tmod","neg","mwe","parataxis","det:predet",
-                    "expl","iobj","cc:preconj","csubj","discourse", "prep"]
-        labels  = labels1 + labels2
+        # labels = ["ROOT","det","nsubj","mark","acl","advmod","falt","nmod:poss","amod","dobj","case","nmod","compound","punct",
+        #             "nsubjpass","auxpass","cc","conj","advcl","cop","acl:relcl","ccomp","aux","csubjpass","nummod","dep",
+        #             "xcomp","appos","nmod:npmod","compound:prt","root","nmod:tmod","neg","mwe","parataxis","det:predet",
+        #             "expl","iobj","cc:preconj","csubj","discourse", "prep"]
+        labels = ['root', 'ROOT','compound:prt', 'acl', 'nsubj:outer', 'discourse', 'list', 'ccomp', 'obj', 'mark', 'cop', 'det',
+                  'appos', 'expl', 'csubj', 'nummod', 'nmod:unmarked', 'advcl:relcl', 'parataxis', 'det:predet', 'case',
+                  'conj', 'punct', 'reparandum', 'compound', 'aux', 'advcl', 'nmod:poss', 'vocative', 'obl:unmarked',
+                  'flat', 'csubj:pass', 'dep', 'xcomp', 'nsubj', 'amod', 'csubj:outer', 'iobj', 'orphan', 'fixed',
+                  'nsubj:pass', 'advmod', 'obl:agent', 'obl', 'aux:pass', 'nmod', 'cc', 'cc:preconj', 'acl:relcl',
+                  'dislocated']
         final_labels = ["self_loop"]
         for label in labels:
             if self.direct:
