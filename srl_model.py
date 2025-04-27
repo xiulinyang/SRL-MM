@@ -502,8 +502,8 @@ class SRTagger(nn.Module):
             text_list = example['ori_sentence']
             label_list = example['label']
             verb_index = example['verb_index']
-            print(example)
-            print(verb_index)
+            # print(example)
+            # print(verb_index)
             pos_label_list = example["pos_label"]
             syn_label_list = example["syn_label"]
             # tt = example[""]
