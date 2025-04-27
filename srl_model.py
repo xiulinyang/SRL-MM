@@ -392,7 +392,7 @@ class SRTagger(nn.Module):
             verb_index = []
             label_len = len(label)
             for j in range(label_len):
-                if label[j] == 'V':
+                if 'B-s' in label[j]:
                     verb_index.append(j)
             dep_instance_parser = DepInstanceParser(basicDependencies=basicDependencies, tokens=tokens)
             if self.dep_order == "first_order":
@@ -502,6 +502,7 @@ class SRTagger(nn.Module):
             text_list = example['ori_sentence']
             label_list = example['label']
             verb_index = example['verb_index']
+            print(example)
             print(verb_index)
             pos_label_list = example["pos_label"]
             syn_label_list = example["syn_label"]
