@@ -43,6 +43,7 @@ class KVMN(nn.Module):
     def forward(self, hidden_state, key_seq, value_matrix, key_mask_matrix, output_kvmn_weight=False):
         embedding_key = self.key_embedding(key_seq)
         embedding_val = self.val_embedding(value_matrix)
+        hidden_state = hidden_state.to(self.hidden_state_compress.weight.dtype)
         hidden_state = self.hidden_state_compress(hidden_state)
 
         if self.b_self_prob is True:
