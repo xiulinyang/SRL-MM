@@ -121,8 +121,8 @@ def train(args):
     num_train_optimization_steps = int(
         len(train_examples) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
     
-    if args.fp16:
-        sr_tagger.half()
+    # if args.fp16:
+    #     sr_tagger.half()
     sr_tagger.to(device)
     
 
@@ -386,8 +386,8 @@ def test(args):
     feature2input = sr_tagger.feature2input
     label_map = {v: k for k, v in sr_tagger.labelmap.items()}
 
-    if args.fp16:
-        sr_tagger.half()
+    # if args.fp16:
+    #     sr_tagger.half()
     sr_tagger.to(device)
     
 
