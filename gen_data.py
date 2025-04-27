@@ -33,3 +33,4 @@ for x in ['dev', 'train', 'test']:
                 new_dict['pos_label'] = b['pos_label']
                 # print(new_dict.keys())
                 json.dump(new_dict, out)
+                out.write('\n')
