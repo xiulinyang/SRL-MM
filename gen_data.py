@@ -36,7 +36,7 @@ for x in ['dev', 'train', 'test']:
                         real_seq_label.append('V')
                         c+=1
                 assert c==1
-                new_dict['sequence_label'] = b['sequence_label']
+                new_dict['sequence_label'] = real_seq_label
                 new_dict['syn_label'] = b['syn_label']
                 new_dict['ori_syn_label'] = b['ori_syn_label']
                 new_dict['pos_label'] = b['pos_label']
