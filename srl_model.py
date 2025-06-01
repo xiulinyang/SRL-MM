@@ -25,7 +25,7 @@ DEFAULT_HPARA = {
     'do_lower_case': False,
     'mlp_dropout': 0.33,
     'n_mlp': 400,
-    'use_crf': False,
+    'use_crf': True,
 }
 
 class KVMN(nn.Module):
