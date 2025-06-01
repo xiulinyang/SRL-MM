@@ -595,7 +595,8 @@ def main():
 
 
     #args.local_rank = -1
-
+    print('arguments included')
+    print(args)
     if args.do_train:
         train(args)
     elif args.do_test:
