@@ -5,7 +5,7 @@ import math
 import numpy as np
 import torch
 from torch import nn
-from transformers import BertModel, BertTokenizer
+from transformers import BertModel, BertTokenizer, AutoTokenizer,T5EncoderModel
 from modules import Biaffine, MLP, CRF
 from transformers_xlnet import XLNetModel, XLNetTokenizer
 from srl_helper import save_json, load_json, get_pos_label_list, get_syn_label_list
@@ -130,6 +130,7 @@ class SRTagger(nn.Module):
         self.tokenizer = None
         self.bert = None
         self.xlnet = None
+        self.t5 = None
         if self.hpara['use_bert']:
             print(model_path)
             self.tokenizer = BertTokenizer.from_pretrained(model_path, do_lower_case=self.hpara['do_lower_case'])
@@ -152,6 +153,9 @@ class SRTagger(nn.Module):
                 self.xlnet.load_state_dict(state_dict)
             hidden_size = self.xlnet.config.hidden_size
             self.dropout = nn.Dropout(self.xlnet.config.summary_last_dropout)
+        elif self.hpara['use_t5']:
+            self.tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
+            self.t5 = T5EncoderModel.from_pretrained(model_path)
         else:
             raise ValueError()
 
@@ -217,6 +221,9 @@ class SRTagger(nn.Module):
         elif self.xlnet is not None:
             transformer_outputs = self.xlnet(input_ids, token_type_ids, attention_mask=attention_mask)
             sequence_output = transformer_outputs[0]
+        elif self.t5 is not None:
+            outputs = self.t5(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)
+            sequence_output = outputs.last_hidden_state
         elif self.zen is not None:
             sequence_output, _ = self.zen(input_ids, input_ngram_ids=input_ngram_ids,
                                           ngram_position_matrix=ngram_position_matrix,
