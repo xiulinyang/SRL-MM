@@ -495,6 +495,8 @@ def main():
     parser.add_argument("--use_xlnet",
                         action='store_true',
                         help="Whether to use XLNet.")
+    parser.add_argument("--use_t5", action='store_true',
+                        help="Whether to use T5.")
     parser.add_argument("--bert_model", default=None, type=str,
                         help="Bert pre-trained model selected in the list: bert-base-uncased, "
                         "bert-large-uncased, bert-base-cased, bert-large-cased, bert-base-multilingual-uncased, "
